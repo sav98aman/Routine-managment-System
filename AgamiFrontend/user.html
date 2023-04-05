@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login</title>
+</head>
+<style>
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    background-color: rgb(248, 246, 246);
+  }
+  /* Navbar related css */
+  
+  #links {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 1%;
+    box-shadow: 2px 2px 5px 5px rgb(235, 235, 235);
+  }
+  
+  #links > div {
+    display: flex;
+    list-style: none;
+  }
+  #links a {
+    text-decoration: none;
+    color: teal;
+    font-size: 30px;
+  }
+  #Submit,button{
+    border: 1px solid rgb(238, 221, 145);
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 5px;
+    height: 40px;
+    margin: 15px;
+    text-align: center;
+    width: 60%;
+  }
+  /* Navbar related css */
+  
+  /* Form related css */
+  
+  input,
+  select {
+    display: block;
+    margin: 15px 0px;
+    font-size: 20px;
+    padding: 2%;
+  }
+  option {
+    font-size: 25px;
+  }
+  form {
+    border-radius: 10px;
+    width: 400px;
+    border: 1px solid rgb(31, 209, 156);
+    margin: 3% auto;
+    padding: 3%;
+    background:whitesmoke
+  }
+  #Submit{
+    border: 1px solid rgb(238, 221, 145);
+    border-radius: 10px;
+    cursor: pointer;
+    
+  }
+  #Submit:hover,button:hove{
+    background-color: aqua;
+  }
+  #btn{
+    /* border: 1px solid red; */
+    margin: auto;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+  }
+</style>
+<body>
+    <div id="login" class="login">
+        <div id="formcontainar">
+            <form id="form">
+                <h2>User Login</h2><br>
+                <label for="email">Enter login Id</label>
+                <input type="email" placeholder="email" id="email">
+                <label for="email">Enter password</label>
+                <input type="password" placeholder=" EnterPassword " id="password">
+                <div id="btn">
+                  <input type="submit" type="submit" id="Submit">
+                  <button><a href="index.html">Admin Login</a></button>
+                </div>
+            </form>
+        </div>
+   </div>
+</body>
+</html>
+
+<script>
+
+document.querySelector("#form").addEventListener("submit",loginpage);
+
+async function login(data){
+    fetch("http://localhost:8888/user/login", {
+        method: "POST",
+        body:data,
+        headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+    })
+    .then((response) => response.json())
+    .then((json) =>{
+            console.log(json)
+            if(json.uuid){
+
+                // userdata.push(json)
+                localStorage.setItem("Userlogin",JSON.stringify(json))
+
+                alert("Login Success ")
+                window.location.href="./userpage.html"
+
+            }else
+            alert(json.message)
+            // document.getElementById("login").innerText=json.message;
+    });
+}
+function loginpage(){
+    event.preventDefault();
+    
+    function Users(email,password){
+        this.email=email;
+        this.password=password;
+    }
+    let email=form.email.value;
+    let password=form.password.value;
+
+    let user=new Users(email,password);
+
+    let data=JSON.stringify(user);
+    //const url=http://localhost:8888/admin/login
+    login(data)
+    console.log(data)
+}
+</script>

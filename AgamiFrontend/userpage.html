@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User DashBord</title>
+</head>
+<style>
+    #dashboard{
+        border: 1px solid red;
+        /* height: fit-content; */
+        margin-top: 10px;
+        padding: 10px;
+        background-color: antiquewhite;
+    }
+    #dashboard>div{
+        /* border: 1px solid; */
+        width: 70%;
+        margin: auto;
+    }
+    ul{
+        display: flex;
+        justify-content: space-around;
+        gap: 10px;
+    }
+    li{
+        list-style: none;
+        
+    }
+    #logout:hover{
+        cursor: pointer;
+        background-color: aqua;
+        border: 1px solid;
+        border-radius: 5px;
+    }
+    table, th, td {  
+        margin-top: 10px;  
+        border: 1px solid black;  
+        margin-left: auto;  
+        margin-right: auto;  
+        border-collapse: collapse;    
+        width: 80%;  
+        text-align: center;  
+        font-size: 20px;  
+}
+tr{
+    /* width: fi; */
+} 
+</style>
+<body>
+    <div id="dashboard">
+        <div>
+            <ul>
+                <li><a id="viewroutine" href="#">view Routine</a></li>
+                <li id="logout">Logout</li>
+            </ul>
+        </div>
+    </div>
+    <div class="routine" id="routine">
+
+    </div>
+</body>
+</html>
+<script>
+
+    let userLoginsession=JSON.parse(localStorage.getItem("Userlogin"));
+    document.querySelector("#viewroutine").addEventListener("click",viewRoutine)
+    document.querySelector("#logout").addEventListener("click",LogOut)
+    //check login or not
+    if(!userLoginsession){
+        alert("Please Login")
+        window.location.href="user.html";
+    }
+    // logout function click logout 
+    function LogOut(){
+        let uuid=userLoginsession.uuid;
+       
+        fetch(`http://localhost:8888/user/logout/${uuid}`, {
+            method: "PATCH",
+            body:[],
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        })
+        .then((response) => response.json())
+        .then((json) =>{
+                
+                    localStorage.removeItem("Userlogin");
+                    alert("logout sucessfully")
+                    window.location.href="user.html";
+                
+                
+        });
+        
+    }
+    
+    function markspersent(element){
+        // console.log("hellsfsfo")
+        // console.log(element)
+        // update status::-
+        let uuid=userLoginsession.uuid;
+        let routine_id=element.routine_id;
+        console.log(routine_id)
+        console.log(uuid)
+        fetch(`http://localhost:8888/user/routine/${uuid}/${routine_id}`, {
+            method: "PATCH",
+            body:[],
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        })
+        .then((response) => response.json())
+        .then((json) =>{
+                console.log(json)
+                if(json.routine_id){
+
+                   alert(" you are current persent")
+
+                    window.location.href="userpage.html";
+
+                }else
+                alert("Error")
+        });
+    }
+
+    function display(data){
+        
+        document.getElementById("routine").innerHTML=null;
+
+            let table =document.createElement("table");
+
+            let trhead=document.createElement("tr");
+            let name=document.createElement("th");
+            let work_time_duration=document.createElement("th");
+            let day=document.createElement("th");
+            let work_name=document.createElement("th");
+            // let active_status=document.createElement("th");
+            let Attendance=document.createElement("th");
+            let clickAttendance=document.createElement("th");
+
+            name.innerText="Name";
+            work_time_duration.innerText="Work Time";
+            day.innerText="day";
+            work_name.innerText="Work Name";
+            Attendance.innerText="Mark Attendance";
+            clickAttendance.innerText="marks Persent"
+
+            trhead.append(name,work_time_duration,day,work_name,Attendance,clickAttendance);
+            table.append(trhead)
+            data.forEach(element => {
+                console.log(element.day)
+           
+           
+                let tr=document.createElement("tr");
+                let td_name=document.createElement("td");
+                let work_time=document.createElement("td");
+                let day_name=document.createElement("td");
+                let work_name=document.createElement("td");
+                let Attendancename=document.createElement("td");
+
+                let btn=document.createElement("button");
+                btn.innerText="mark to persent"
+
+                td_name.innerText=element.user.name;
+                work_time.innerText=element.work_time_duration;
+                day_name.innerText=element.day;
+                work_name.innerText=element.work_name;
+                Attendancename.innerText=element.attentdance;
+
+                if(element.attentdance){
+                    btn.innerText="persnt";
+                    
+                }else{
+                    btn.addEventListener("click",function(){
+                        markspersent(element);
+                    });
+                }
+                tr.append(td_name,work_time,day_name,work_name,Attendancename,btn);
+
+                table.append(tr)
+                document.getElementById("routine").append(table);
+                console.log(table)
+        });
+        if(data.length==0){
+           document.getElementById("routine").innerHTML="No Routine Avilable this Time"
+           document.getElementById("routine").style.color="Red"
+
+        }
+       
+    }
+    async function welcome(uuid){
+        const url=`http://localhost:8888/user/routine/${uuid}`;
+        let res=await fetch(url)
+        let data=await res.json();
+        
+        console.log(data)        
+        display(data);
+    }
+    function viewRoutine(){
+        welcome(userLoginsession.uuid);
+    }
+    
+    console.log(userLoginsession.uuid)
+</script>

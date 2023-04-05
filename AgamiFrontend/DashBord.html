@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DashBord</title>
+</head>
+<style>
+    *{
+        margin: 0px;
+        padding: 0px;
+    }
+    #dashboard{
+        border: 1px solid red;
+        /* height: fit-content; */
+        margin-top: 10px;
+        padding: 10px;
+        background-color: antiquewhite;
+    }
+    #dashboard>div{
+        /* border: 1px solid; */
+        width: 70%;
+        margin: auto;
+    }
+    #ul{
+        display: flex;
+        justify-content: space-around;
+        gap: 10px;
+    }
+    .liclass{
+        list-style: none;
+        cursor: pointer;
+    }
+    .liclass:hover{
+        color: blue;
+    }
+</style>
+<body>
+      
+    <div id="dashboard">
+        <div>
+            <ul id="ul">
+                <li class="liclass"><a href="AddStaff.html">Add Staff</a></li>
+                <li class="liclass"><a href="./viewstaf.html">View staff</a></li>
+                <li class="liclass"><a href="routine.html">create Routine</a></li>
+                <li class="liclass" id="logout">Logout</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    let aadminLoginsession=JSON.parse(localStorage.getItem("signupdata"));
+    
+    document.querySelector("#logout").addEventListener("click",LogOut)
+    //check login or not
+    
+    // logout function click logout 
+    function LogOut(){
+        let uuid=aadminLoginsession.uuid;
+       
+        fetch(`http://localhost:8888/user/logout/${uuid}`, {
+            method: "PATCH",
+            body:[],
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        })
+        .then((response) => response.json())
+        .then((json) =>{
+                console.log(json)
+                if(!json.timestamp){
+                    alert(json.message)
+                }else{
+                    localStorage.removeItem("signupdata");
+                    alert("logout sucessfully")
+                    window.location.href="user.html";
+                }
+                
+        });
+        
+    }
+</script>

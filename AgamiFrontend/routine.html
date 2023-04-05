@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreateRoutine</title>
+</head>
+<style>
+     * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    background-color: rgb(248, 246, 246);
+  }
+  /* Navbar related css */
+  #submit {
+    width: 70%;
+    margin: auto;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 15px;
+  }
+  
+  input,
+  select {
+    display: block;
+    margin: 15px 0px;
+    font-size: 20px;
+    padding: 2%;
+  }
+  option {
+    font-size: 25px;
+  }
+  form {
+    border-radius: 10px;
+    width: 400px;
+    border: 1px solid rgb(31, 209, 156);
+    margin: 3% auto;
+    padding: 3%;
+    background:whitesmoke
+  }
+  #Submit{
+    border: 1px solid rgb(238, 221, 145);
+    border-radius: 10px;
+    cursor: pointer;
+    
+  }
+  #Submit:hover{
+    background-color: aqua;
+  }
+   /* Navbar related css */
+   #dashboard{
+        border: 1px solid red;
+        /* height: fit-content; */
+        margin-top: 10px;
+        padding: 10px;
+        background-color: antiquewhite;
+    }
+    #dashboard>div{
+        /* border: 1px solid; */
+        width: 70%;
+        margin: auto;
+    }
+    #ul{
+        display: flex;
+        justify-content: space-around;
+        gap: 10px;
+    }
+    .liclass{
+        list-style: none;
+        cursor: pointer;
+    }
+    .liclass:hover{
+        color: blue;
+    }
+</style>
+<body>
+    <!-- navbar  -->
+    <div id="dashboard">
+        <div>
+            <ul id="ul">
+                <li class="liclass"><a href="AddStaff.html">Add Staff</a></li>
+                <li class="liclass"><a href="./viewstaf.html">View staff</a></li>
+                <li class="liclass"><a href="routine.html">create Routine</a></li>
+                <li class="liclass" id="logout">Logout</li>
+            </ul>
+        </div>
+    </div>
+    <div class="routine" id="routine">
+        <form id="form">
+                <label for="email">Enter Email :</label>
+                <input type="email" id="email" placeholder="abc@gmail.com">
+                <label for="name">Enter Day Name :</label>
+                <input type="text" id="day" placeholder="Monday,Wed...">
+                <label for="name">Enter Work Name :</label>
+                <input type="text" id="work_name" placeholder="coding,Assignments,...">
+                <label for="name">Enter Work Time :</label>
+                <input type="text" id="work_time_duration" placeholder="coding,Assignments,...">
+                <input type="submit"  type="submit" id="Submit" value="submit">
+        </form>
+
+    </div>
+</body>
+</html>
+<script>
+    //logout
+    let aadminLoginsession=JSON.parse(localStorage.getItem("signupdata"));
+    
+    document.querySelector("#logout").addEventListener("click",LogOut)
+    //check login or not
+    
+    // logout function click logout 
+    function LogOut(){
+        let uuid=aadminLoginsession.uuid;
+       
+        fetch(`http://localhost:8888/user/logout/${uuid}`, {
+            method: "PATCH",
+            body:[],
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        })
+        .then((response) => response.json())
+        .then((json) =>{
+                console.log(json)
+                if(!json.timestamp){
+                    alert(json.message)
+                }else{
+                    localStorage.removeItem("signupdata");
+                    alert("logout sucessfully")
+                    window.location.href="user.html";
+                }
+                
+        });
+        
+    }
+    ///****add routine
+    let currnetsession=JSON.parse(localStorage.getItem("signupdata"));
+    document.querySelector("#form").addEventListener("submit",AddRoutine);
+
+    async function RoutineAdd(data,uuid,useremail){
+       
+        fetch(`http://localhost:8888/admin/createRoutine/${uuid}/${useremail}`, {
+            method: "POST",
+            body:data,
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        })
+        .then((response) => response.json())
+        .then((json) =>{
+                console.log(json)
+                if(json.routine_id){
+
+                    alert("Routine add Successfully")
+                    window.location.href="./DashBord.html"
+
+                }else
+                alert(json.message)
+                // document.getElementById("login").innerText=json.message;
+        });
+    }
+    // get data from input
+    function AddRoutine(){
+        event.preventDefault();
+        
+        function Users(day,work_name,work_time_duration){
+            this.day=day;
+            this.work_name=work_name;
+            this.work_time_duration=work_time_duration;
+        }
+        let day=form.day.value;
+        let work_name=form.work_name.value;
+        let work_time_duration=form.work_time_duration.value;
+        let email=form.email.value;
+
+        let routine=new Users(day,work_name,work_time_duration);
+
+        let data=JSON.stringify(routine);
+        RoutineAdd(data,currnetsession.uuid,email);
+        console.log(data)
+        console.log(currnetsession.uuid)
+    }
+   
+</script>

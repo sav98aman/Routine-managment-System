@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login </title>
+</head>
+<style>
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    background-color: rgb(248, 246, 246);
+  }
+  /* Navbar related css */
+  #submit {
+    width: 70%;
+    margin: auto;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 15px;
+  }
+  
+  input,
+  select {
+    display: block;
+    margin: 15px 0px;
+    font-size: 20px;
+    padding: 2%;
+  }
+  option {
+    font-size: 25px;
+  }
+  form {
+    border-radius: 10px;
+    width: 400px;
+    border: 1px solid rgb(31, 209, 156);
+    margin: 3% auto;
+    padding: 3%;
+    background:whitesmoke
+  }
+  #Submit,button{
+    border: 1px solid rgb(238, 221, 145);
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 5px;
+    height: 40px;
+    margin: 15px;
+    text-align: center;
+    width: 60%;
+  }
+  #Submit:hover,button:hover{
+    background-color: aqua;
+  }
+  #btn{
+    /* border: 1px solid red; */
+    margin: auto;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+  }
+ 
+
+</style>
+<body>
+    <!-- Admin login -->
+
+            <form id="form">
+                <h2>Admin Login</h2><br>
+                <label for="email">Enter login Id</label>
+                <input type="email" placeholder="email" id="email">
+                <label for="email">Enter password</label>
+                <input type="password" placeholder=" EnterPassword " id="password">
+                <div id="btn">
+                    <input type="submit" type="submit" id="Submit" value="login">
+                    
+                    <Button id="userloginpage"><a href="user.html">User login</a></Button> 
+                </div> 
+            </form>
+            
+    
+</body>
+</html>
+<!-- <script src="./logoutUser.js"></script> -->
+<script>
+    let userLoginsession=JSON.parse(localStorage.getItem("Userlogin"));
+    let adminLoginsession=JSON.parse(localStorage.getItem("signupdata"));
+    //check all reday login 
+    if(adminLoginsession){
+        if(adminLoginsession.actives_status){
+          alert("please Login first")
+          alert("welcome Admin page ")
+          window.location.href="./DashBord.html"
+        }
+    }else{
+      alert("please Admin Login")
+    }
+    document.querySelector("#form").addEventListener("submit",loginpage);
+    
+    async function login(data){
+        fetch("http://localhost:8888/admin/login", {
+            method: "POST",
+            body:data,
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        })
+        .then((response) => response.json())
+        .then((json) =>{
+                console.log(json)
+                if(json.uuid){
+                    localStorage.setItem("signupdata",JSON.stringify(json))
+
+                    alert("Login Success ")
+                    window.location.href="./DashBord.html"
+
+                }else
+                alert(json.message)
+                // document.getElementById("login").innerText=json.message;
+        });
+    }
+    function loginpage(){
+        event.preventDefault();
+        
+        function Users(email,password){
+            this.email=email;
+            this.password=password;
+        }
+        let email=form.email.value;
+        let password=form.password.value;
+
+        let user=new Users(email,password);
+
+        let data=JSON.stringify(user);
+        //const url=http://localhost:8888/admin/login
+        login(data)
+        console.log(data)
+    }
+
+
+</script>

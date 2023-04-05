@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StafList</title>
+</head>
+<style>
+    *{
+        margin: 0px;
+        padding: 0px;
+    }
+    #dashboard{
+        border: 1px solid red;
+        /* height: fit-content; */
+        margin-top: 10px;
+        padding: 10px;
+        background-color: antiquewhite;
+    }
+    #dashboard>div{
+        /* border: 1px solid; */
+        width: 70%;
+        margin: auto;
+    }
+    #ul{
+        display: flex;
+        justify-content: space-around;
+        gap: 10px;
+    }
+    .liclass{
+        list-style: none;
+        cursor: pointer;
+    }
+    .liclass:hover{
+        color: blue;
+    }
+
+    
+    table, th, td {  
+        margin-top: 10px;  
+        border: 1px solid black;  
+        margin-left: auto;  
+        margin-right: auto;  
+        border-collapse: collapse;    
+        width: 80%;  
+        text-align: center;  
+        font-size: 20px;  
+}    
+</style>
+<body>
+    <div id="dashboard">
+        <div>
+            <ul id="ul">
+                <li class="liclass"><a href="AddStaff.html">Add Staff</a></li>
+                <li class="liclass"><a href="./viewstaf.html">View staff</a></li>
+                <li class="liclass"><a href="routine.html">create Routine</a></li>
+                <li class="liclass" id="logout">Logout</li>
+            </ul>
+        </div>
+    </div>
+    <div id="stafflist"></div>
+</body>
+</html>
+<script>
+    let currnetsession=JSON.parse(localStorage.getItem("signupdata"));
+    let aadminLoginsession=JSON.parse(localStorage.getItem("signupdata"));
+    document.querySelector("#logout").addEventListener("click",LogOut)
+    //check login or not 
+    // logout function click logout 
+    function LogOut(){
+        let uuid=aadminLoginsession.uuid;
+        fetch(`http://localhost:8888/user/logout/${uuid}`, {
+            method: "PATCH",
+            body:[],
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        })
+        .then((response) => response.json())
+        .then((json) =>{
+                console.log(json)
+                if(!json.timestamp){
+                    alert(json.message)
+                }else{
+                    localStorage.removeItem("signupdata");
+                    alert("logout sucessfully")
+                    window.location.href="user.html";
+                }     
+        });   
+    }
+    function display(data){
+            let table =document.createElement("table");
+            
+            table.setAttribute("class","table");
+
+
+            // table.style.width="50%"
+            // table.style.border="1px solid"
+
+            let trhead=document.createElement("tr");
+            trhead.setAttribute("id","theader")
+            let name=document.createElement("th");
+            let phone=document.createElement("th");
+            let email=document.createElement("th");
+            let active_status=document.createElement("th");
+            name.innerText="Name";
+            phone.innerText="Phone";
+            email.innerText="Email";
+            active_status.innerText="Status";
+
+            trhead.append(name,email,phone,active_status);
+            table.append(trhead)
+        data.forEach(element => {
+           
+            let tr=document.createElement("tr");
+            let td_name=document.createElement("td");
+            let td_phone=document.createElement("td");
+            let td_email=document.createElement("td");
+            let td_status=document.createElement("td");
+            td_name.innerText=element.name;
+            td_email.innerText=element.email;
+            td_phone.innerText=element.phone;
+            td_status.innerText=element.active;
+
+            tr.append(td_name,td_email,td_phone,td_status);
+
+            table.append(tr)
+            document.getElementById("stafflist").append(table);
+            console.log(table)
+        });
+       
+    }
+    // welcome Message
+    async function welcome(uuid){
+        const url=`http://localhost:8888/admin/viewstaff/${uuid}`;
+        let res=await fetch(url)
+        let data=await res.json();
+        
+        console.log(data)
+        display(data);
+    }
+    welcome(currnetsession.uuid);
+    console.log(currnetsession.uuid)
+</script>
